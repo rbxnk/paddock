@@ -1,0 +1,27 @@
+# Not deployed yet. Before the first deploy: fly apps create __NAME__, fly volumes create data,
+# fly storage create (Litestream's bucket), and the SMTP and APP_URL secrets.
+app = "__NAME__"
+primary_region = "ord"
+
+# One machine, one volume: Litestream needs a single writer. Never scale past one machine.
+[mounts]
+  source = "data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/login"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "30s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

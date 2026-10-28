@@ -1,0 +1,6 @@
+package ui
+
+// Alert is a dismissable message, the toast web.HTMXErrors sends.
+templ Alert(msg string) {
+	<div class="alert alert-info cursor-pointer" role="alert" hx-on:click="this.remove()">{ msg }</div>
+}

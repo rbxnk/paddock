@@ -1,0 +1,9 @@
+@import "tailwindcss" source(none);
+
+/* .paddock is the kit's folder (make css links it) */
+@plugin "../.paddock/assets/daisyui.mjs" {
+   themes: light --default, dark --prefersdark;
+}
+
+@source "../*.templ";
+@source "../.paddock/ui";

@@ -1,0 +1,14 @@
+# Streams the database to the bucket within a second of each write. On a machine whose volume
+# has no database it restores from the bucket first, then starts the app. Bucket and
+# credentials come from the secrets `fly storage create` sets.
+exec: /app/__NAME__ --http 0.0.0.0:8080 --db /data/__NAME__.db serve
+
+snapshot:
+  interval: 24h
+  retention: 168h
+
+dbs:
+  - path: /data/__NAME__.db
+    restore-if-db-not-exists: true
+    replica:
+      url: s3://${BUCKET_NAME}/__NAME__.db?endpoint=${AWS_ENDPOINT_URL_S3}&region=auto
