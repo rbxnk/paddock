@@ -64,11 +64,18 @@ func main() {
 	if err := create(name, dir, version, replace); err != nil {
 		log.Fatal(err)
 	}
-	if err := goCmd(dir, "mod", "tidy"); err != nil {
+	if err := run(dir, "go", "mod", "tidy"); err != nil {
+		log.Fatal(err)
+	}
+	// The first build, so plain go build and go test work right away.
+	if err := run(dir, "go", "tool", "templ", "generate"); err != nil {
+		log.Fatal(err)
+	}
+	if err := run(dir, "make", "css"); err != nil {
 		log.Fatal(err)
 	}
 	if _, err := os.Stat("go.work"); err == nil && dev {
-		if err := goCmd(".", "work", "use", dir); err != nil {
+		if err := run(".", "go", "work", "use", dir); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -81,11 +88,11 @@ func devRepo() bool {
 	return err == nil && strings.HasPrefix(string(b), "module "+module+"\n")
 }
 
-func goCmd(dir string, args ...string) error {
-	cmd := exec.Command("go", args...)
+func run(dir, name string, args ...string) error {
+	cmd := exec.Command(name, args...)
 	cmd.Dir, cmd.Stdout, cmd.Stderr = dir, os.Stdout, os.Stderr
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("go %s: %w", strings.Join(args, " "), err)
+		return fmt.Errorf("%s %s: %w", name, strings.Join(args, " "), err)
 	}
 	return nil
 }
